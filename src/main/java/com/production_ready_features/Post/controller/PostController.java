@@ -1,5 +1,6 @@
 package com.production_ready_features.Post.controller;
 
+import com.production_ready_features.Post.PostApplication;
 import com.production_ready_features.Post.dtos.PostDto;
 import com.production_ready_features.Post.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "/post")
+@RequestMapping(path = "/posts")
 public class PostController {
     private final PostService postService;
 
@@ -30,5 +31,13 @@ public class PostController {
     public ResponseEntity<PostDto> createNewPosts(@RequestBody PostDto postDto)
     {
         return ResponseEntity.ok(postService.createNewPost(postDto));
+    }
+
+
+    @PutMapping(path = "/{postId}")
+    public ResponseEntity<PostDto> updatePost(@PathVariable Long postId
+    ,@RequestBody PostDto postDto)
+    {
+        return ResponseEntity.ok(postService.updatePosts(postId,postDto));
     }
 }

@@ -4,7 +4,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.authentication.configurers.provisioning.InMemoryUserDetailsManagerConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -29,7 +31,7 @@ public class WebSecurityConfig {
     {
         httpSecurity
                 .authorizeHttpRequests(auth->auth
-                        .requestMatchers(HttpMethod.GET,"/posts").permitAll()
+                        .requestMatchers("/posts","/auth/**").permitAll()
                         .requestMatchers("/posts/**").hasAnyRole("ADMIN")
                         .anyRequest().authenticated())
                 .csrf(csrfConfig->csrfConfig.disable())
@@ -38,27 +40,33 @@ public class WebSecurityConfig {
         return httpSecurity.build();
     }
 
-    @Bean
-    UserDetailsService userDetailsService()
-    {
-        UserDetails userDetails1 = User
-                .withUsername("Likitha")
-                .password(passwordEncoder().encode("Likitha@123"))
-                .roles("USER")
-                .build();
-        UserDetails userDetails2 = User
-                .withUsername("guddu")
-                .password(passwordEncoder().encode("guddu@123"))
-                .roles("ADMIN")
-                .build();
-
-        return new InMemoryUserDetailsManager(List.of(userDetails1,userDetails2));
-
-    }
+//    @Bean
+//    UserDetailsService userDetailsService()
+//    {
+//        UserDetails userDetails1 = User
+//                .withUsername("Likitha")
+//                .password(passwordEncoder().encode("Likitha@123"))
+//                .roles("USER")
+//                .build();
+//        UserDetails userDetails2 = User
+//                .withUsername("guddu")
+//                .password(passwordEncoder().encode("guddu@123"))
+//                .roles("ADMIN")
+//                .build();
+//
+//        return new InMemoryUserDetailsManager(List.of(userDetails1,userDetails2));
+//
+//    }
 
     @Bean
     PasswordEncoder passwordEncoder()
     {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
+    {
+        return configuration.getAuthenticationManager();
     }
 }

@@ -1,5 +1,6 @@
 package com.production_ready_features.Post.service;
 
+import com.production_ready_features.Post.entities.User;
 import com.production_ready_features.Post.exceptions.ResourceNotFoundException;
 import com.production_ready_features.Post.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,5 +17,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByEmail(username).
                 orElseThrow(()-> new ResourceNotFoundException("User not found"));
+    }
+
+    public User findUserByUserId(Long userId)
+    {
+        return userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User not found"));
     }
 }

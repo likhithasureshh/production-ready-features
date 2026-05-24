@@ -1,6 +1,7 @@
 package com.production_ready_features.Post.service;
 
 import com.production_ready_features.Post.dtos.LoginDto;
+import com.production_ready_features.Post.dtos.LoginResponseDto;
 import com.production_ready_features.Post.dtos.SignUpRequest;
 import com.production_ready_features.Post.dtos.UserDto;
 import com.production_ready_features.Post.entities.User;
@@ -24,6 +25,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final UserDetailsServiceImpl userDetailsService;
 
     public UserDto signUp(SignUpRequest signUpRequest) {
         Optional<User> user = userRepository.findByEmail(signUpRequest.getEmail());
@@ -36,12 +38,22 @@ public class AuthService {
         return modelMapper.map(userRepository.save(toBeSaved),UserDto.class);
     }
 
-    public String login(LoginDto loginDto)
+    public LoginResponseDto login(LoginDto loginDto)
     {
        Authentication authentication = authenticationManager.authenticate(
                new UsernamePasswordAuthenticationToken(loginDto.getEmail(),loginDto.getPassword())
        );
        User user = (User) authentication.getPrincipal();
-        return jwtService.generateToken(user);
+       String accessToken = jwtService.generateAccessToken(user);
+       String refreshToken = jwtService.generateRefreshToken(user);
+       return new LoginResponseDto(user.getId(),accessToken,refreshToken);
+    }
+
+    public LoginResponseDto refresh(String refreshToken)
+    {
+        Long userId = jwtService.getUserIdFromToken(refreshToken);
+        User user = userDetailsService.findUserByUserId(userId);
+        String accessToken = jwtService.generateAccessToken(user);
+        return new LoginResponseDto(userId,accessToken,refreshToken);
     }
 }

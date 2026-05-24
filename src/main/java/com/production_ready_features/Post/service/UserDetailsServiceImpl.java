@@ -4,6 +4,7 @@ import com.production_ready_features.Post.entities.User;
 import com.production_ready_features.Post.exceptions.ResourceNotFoundException;
 import com.production_ready_features.Post.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,11 +17,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByEmail(username).
-                orElseThrow(()-> new ResourceNotFoundException("User not found"));
+                orElseThrow(()-> new BadCredentialsException("User not found"));
     }
 
     public User findUserByUserId(Long userId)
     {
-        return userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User not found"));
+        return userRepository.findById(userId).orElseThrow(()-> new BadCredentialsException("User not found"));
     }
 }

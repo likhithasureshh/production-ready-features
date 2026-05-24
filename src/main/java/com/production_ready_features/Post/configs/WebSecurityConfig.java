@@ -2,6 +2,7 @@ package com.production_ready_features.Post.configs;
 
 import com.production_ready_features.Post.filter.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -22,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.util.List;
 
@@ -32,12 +34,13 @@ public class WebSecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
 
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception
     {
         httpSecurity
                 .authorizeHttpRequests(auth->auth
-                        .requestMatchers("/posts","/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/auth/**").permitAll()
 //                        .requestMatchers("/posts/**").hasAnyRole("ADMIN")
                         .anyRequest().authenticated())
                 .csrf(csrfConfig->csrfConfig.disable())

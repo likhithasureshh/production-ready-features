@@ -13,9 +13,6 @@ public class JwtTests {
     @Test
     void generateToken()
     {
-        User user = new User(3L,"likitha","liki@gmail.com","1234");
-        String token = jwtService.generateToken(user);
-        System.out.println(token);
 
     }
 
@@ -23,8 +20,7 @@ public class JwtTests {
     void getUserFromToken()
     {
 
-        Long id = jwtService.getUserIdFromToken("eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIzIiwiZW1haWwiOiJsaWtpQGdtYWlsLmNvbSIsInJvbGVzIjpbIkFETUlOIiwiVVNFUiJdLCJpYXQiOjE3NzkwMjc0ODMsImV4cCI6MTc3OTAyNzU0M30.NRIDoW-6wh1o2Ek5mARlEPbbhfffv-ZClUY_WqWjEZjbWxa0VDNiwmxSX0lqvYRZ");
-        System.out.println(id);
+
     }
 
 

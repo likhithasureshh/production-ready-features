@@ -26,6 +26,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final UserDetailsServiceImpl userDetailsService;
+    private final SessionService sessionService;
 
     public UserDto signUp(SignUpRequest signUpRequest) {
         Optional<User> user = userRepository.findByEmail(signUpRequest.getEmail());
@@ -46,6 +47,8 @@ public class AuthService {
        User user = (User) authentication.getPrincipal();
        String accessToken = jwtService.generateAccessToken(user);
        String refreshToken = jwtService.generateRefreshToken(user);
+       sessionService.generateNewSession(user,refreshToken);
+
        return new LoginResponseDto(user.getId(),accessToken,refreshToken);
     }
 
@@ -53,6 +56,7 @@ public class AuthService {
     {
         Long userId = jwtService.getUserIdFromToken(refreshToken);
         User user = userDetailsService.findUserByUserId(userId);
+        sessionService.invalidate(refreshToken);
         String accessToken = jwtService.generateAccessToken(user);
         return new LoginResponseDto(userId,accessToken,refreshToken);
     }

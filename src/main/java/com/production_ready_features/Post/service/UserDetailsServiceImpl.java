@@ -24,4 +24,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     {
         return userRepository.findById(userId).orElseThrow(()-> new BadCredentialsException("User not found"));
     }
+
+    public User findUserByUserEmail(String email)
+    {
+        return userRepository.findByEmail(email).orElse(null);
+    }
+
+
+    public User save(User newUser) {
+        return userRepository.save(newUser);
+    }
 }

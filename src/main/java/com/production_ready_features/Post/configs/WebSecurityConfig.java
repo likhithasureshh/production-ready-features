@@ -1,6 +1,7 @@
 package com.production_ready_features.Post.configs;
 
 import com.production_ready_features.Post.filter.JwtAuthFilter;
+import com.production_ready_features.Post.handler.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -33,6 +34,7 @@ import java.util.List;
 public class WebSecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
 
     @Bean
@@ -41,11 +43,15 @@ public class WebSecurityConfig {
         httpSecurity
                 .authorizeHttpRequests(auth->auth
                         .requestMatchers(HttpMethod.POST,"/auth/**").permitAll()
+                        .requestMatchers("/login","/home.html").permitAll()
 //                        .requestMatchers("/posts/**").hasAnyRole("ADMIN")
                         .anyRequest().authenticated())
                 .csrf(csrfConfig->csrfConfig.disable())
-                .sessionManagement(sessionConfig->sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+//                .sessionManagement(sessionConfig->sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .oauth2Login(oauth2Config -> oauth2Config
+                        .failureUrl("http://localhost:9000/login?error=true")
+                        .successHandler(oAuth2SuccessHandler));
 //                .formLogin(Customizer.withDefaults());
         return httpSecurity.build();
     }

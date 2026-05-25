@@ -1,5 +1,6 @@
 package com.production_ready_features.Post.configs;
 
+import com.production_ready_features.Post.entities.enums.Role;
 import com.production_ready_features.Post.filter.JwtAuthFilter;
 import com.production_ready_features.Post.handler.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,10 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.util.List;
 
+import static com.production_ready_features.Post.entities.enums.Permission.*;
+import static com.production_ready_features.Post.entities.enums.Role.ADMIN;
+import static com.production_ready_features.Post.entities.enums.Role.CREATOR;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -35,6 +40,9 @@ public class WebSecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final String[] publicRoutes = {
+            "/auth/**","/login","/home.html"
+    };
 
 
     @Bean
@@ -42,16 +50,20 @@ public class WebSecurityConfig {
     {
         httpSecurity
                 .authorizeHttpRequests(auth->auth
-                        .requestMatchers(HttpMethod.POST,"/auth/**").permitAll()
-                        .requestMatchers("/login","/home.html").permitAll()
-//                        .requestMatchers("/posts/**").hasAnyRole("ADMIN")
+                        .requestMatchers(publicRoutes).permitAll()
+                        .requestMatchers(HttpMethod.GET,"/posts/**").hasAuthority(POST_VIEW.name())
+                        .requestMatchers(HttpMethod.POST,"/posts").hasAuthority(POST_CREATE.name())
+                        .requestMatchers(HttpMethod.PUT,"/posts/**").hasAuthority(POST_UPDATE.name())
+                        .requestMatchers(HttpMethod.DELETE,"/posts/**").hasAuthority(POST_DELETE.name())
+
+//
                         .anyRequest().authenticated())
                 .csrf(csrfConfig->csrfConfig.disable())
 //                .sessionManagement(sessionConfig->sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .oauth2Login(oauth2Config -> oauth2Config
-                        .failureUrl("http://localhost:9000/login?error=true")
-                        .successHandler(oAuth2SuccessHandler));
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+//                .oauth2Login(oauth2Config -> oauth2Config
+//                        .failureUrl("http://localhost:9000/login?error=true")
+//                        .successHandler(oAuth2SuccessHandler));
 //                .formLogin(Customizer.withDefaults());
         return httpSecurity.build();
     }

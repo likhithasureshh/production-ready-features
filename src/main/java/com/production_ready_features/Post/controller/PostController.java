@@ -5,6 +5,8 @@ import com.production_ready_features.Post.dtos.PostDto;
 import com.production_ready_features.Post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,12 +24,14 @@ public class PostController {
     }
 
     @GetMapping(path = "/{postId}")
+    @PreAuthorize("@postSecurity.getPostByOwner(#postId)")
     public ResponseEntity<PostDto> getPostsById(@PathVariable Long postId)
     {
         return ResponseEntity.ok(postService.getPostById(postId));
     }
 
     @PostMapping
+    @Secured({"ROLE_ADMIN","ROLE_CREATOR"})
     public ResponseEntity<PostDto> createNewPosts(@RequestBody PostDto postDto)
     {
         return ResponseEntity.ok(postService.createNewPost(postDto));
@@ -35,6 +39,7 @@ public class PostController {
 
 
     @PutMapping(path = "/{postId}")
+
     public ResponseEntity<PostDto> updatePost(@PathVariable Long postId
     ,@RequestBody PostDto postDto)
     {

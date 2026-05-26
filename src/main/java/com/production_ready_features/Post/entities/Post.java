@@ -9,12 +9,13 @@ import org.hibernate.envers.Audited;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Audited
-public class Post extends AuditEntity {
+public class Post{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
     private String description;
+    @ManyToOne
+    private User owner;
 }
